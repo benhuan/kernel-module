@@ -1,4 +1,5 @@
-# Object files
+nbproject
+#a Object files
 *.o
 *.ko
 *.obj
