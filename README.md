@@ -3,8 +3,8 @@ some basic kernel modules, helloworld in kernel
 ## how to use
 `$make`
 
-`$lnsmod ./MODULE_NAME.ko`
+`$sudo insmod ./MODULE_NAME.ko`
 
 `$dmesg | tail`
 
-`$rmmod MODULE_NAME`
+`$sudo rmmod MODULE_NAME`
