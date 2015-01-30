@@ -9,6 +9,7 @@ nbproject
 *.ko
 *.obj
 *.elf
+*.mod.c
 
 # Precompiled Headers
 *.gch

@@ -6,7 +6,7 @@ PWD := $(shell pwd)
 
 default:
 	make -C $(KDIR) SUBDIRS=$(PWD) modules 
-	rm *.o *.mod.c
+	#rm *.o *.mod.c
 
 clean:
 	make -C $(KDIR) SUBDIRS=$(PWD) clean
