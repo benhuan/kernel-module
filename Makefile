@@ -1,5 +1,4 @@
-SRC = hello-5.c
-
+SRC = reverse.c
 
 obj-m += $(SRC:.c=.o)
 
