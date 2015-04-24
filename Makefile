@@ -1,5 +1,5 @@
-SRC = reverse.c
-
+export mysrc
+SRC = $(mysrc)
 obj-m += $(SRC:.c=.o)
 
 KDIR := /lib/modules/$(shell uname -r)/build
