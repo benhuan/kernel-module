@@ -3,11 +3,11 @@
  *  passing command line arguements to a module
  *
  */
-#include <linux/module.h>	/* Needed by all modules */
-#include <linux/kernel.h>	/* Needed for KERN_INFO */
-#include <linux/init.h>		/* Needed for the macros */
-#include <linux/time.h>
+#include <linux/init.h>   /* Needed for the macros */
+#include <linux/kernel.h> /* Needed for KERN_INFO */
+#include <linux/module.h> /* Needed by all modules */
 #include <linux/moduleparam.h>
+#include <linux/time.h>
 
 #define MOD_VERSION 5
 
@@ -15,7 +15,7 @@ static short int myshort = 1;
 static int myint = 326;
 static long int mylong = 12398212;
 static char *mystring = "mystring";
-static int myintArray [] = {-1, 1, 2, 3, 5, 7};
+static int myintArray[] = {-1, 1, 2, 3, 5, 7};
 static int arr_argc = 0;
 /*
  * module_param(foo, int, 0000)
@@ -45,36 +45,34 @@ MODULE_PARM_DESC(mystring, "A character string");
 module_param_array(myintArray, int, &arr_argc, 0000);
 MODULE_PARM_DESC(myintArray, "An array of integers");
 
-static int __init
-hello_init(void) {
-    struct timespec ts_start, ts_end;
-    long i = 10000000;
+static int __init hello_init(void) {
+  struct timespec ts_start, ts_end;
+  long i = 10000000;
 
-    printk(KERN_INFO "Hello, world %d \n", MOD_VERSION);
+  printk(KERN_INFO "Hello, world %d \n", MOD_VERSION);
 
-    getnstimeofday(&ts_start);
-    while (i--);
-    getnstimeofday(&ts_end);
+  getnstimeofday(&ts_start);
+  while (i--)
+    ;
+  getnstimeofday(&ts_end);
 
-    printk(KERN_INFO "%lu\n", ts_end.tv_nsec - ts_start.tv_nsec);
+  printk(KERN_INFO "%lu\n", ts_end.tv_nsec - ts_start.tv_nsec);
 
-    i=0;
-    printk(KERN_INFO "Hello, world 5\n=============\n");
-    printk(KERN_INFO "myshort is a short integer: %hd\n", myshort);
-    printk(KERN_INFO "myint is an integer: %d\n", myint);
-    printk(KERN_INFO "mylong is a long integer: %ld\n", mylong);
-    printk(KERN_INFO "mystring is a string: %s\n", mystring);
-    for (i = 0; i < (sizeof myintArray / sizeof (int)); i++)
-    {
-        printk(KERN_INFO "myintArray[%d] = %d\n", i, myintArray[i]);
-    }
-    printk(KERN_INFO "got %d arguments for myintArray.\n", arr_argc);
-    return 0;
+  i = 0;
+  printk(KERN_INFO "Hello, world 5\n=============\n");
+  printk(KERN_INFO "myshort is a short integer: %hd\n", myshort);
+  printk(KERN_INFO "myint is an integer: %d\n", myint);
+  printk(KERN_INFO "mylong is a long integer: %ld\n", mylong);
+  printk(KERN_INFO "mystring is a string: %s\n", mystring);
+  for (i = 0; i < (sizeof myintArray / sizeof(int)); i++) {
+    printk(KERN_INFO "myintArray[%d] = %d\n", i, myintArray[i]);
+  }
+  printk(KERN_INFO "got %d arguments for myintArray.\n", arr_argc);
+  return 0;
 }
 
-static void __exit
-hello_exit(void) {
-    printk(KERN_INFO "Goodbye,%d \n", MOD_VERSION);
+static void __exit hello_exit(void) {
+  printk(KERN_INFO "Goodbye,%d \n", MOD_VERSION);
 }
 
 module_init(hello_init);
