@@ -1,13 +1,15 @@
-export mysrc
-SRC = $(mysrc)
-obj-m += $(SRC:.c=.o)
-
+print-%  : ; @echo $* = $($*)
 KDIR := /lib/modules/$(shell uname -r)/build
-PWD := $(shell pwd) 
+PWD := $(shell pwd)
 
-default:
-	make -C $(KDIR) SUBDIRS=$(PWD) modules 
+#SRCs := $(wildcard *.c)
+#OBJs := $(SRCs:.c=.o)
+
+obj-m += $(MY_TARGET)
+
+
+all:
+	make -C $(KDIR) M=$(PWD) modules
 	rm *.o *.mod.c
-
 clean:
-	make -C $(KDIR) SUBDIRS=$(PWD) clean
+	make -C $(KDIR) M=$(PWD) clean

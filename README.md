@@ -1,10 +1,19 @@
 # kernel-module
-some basic kernel modules, helloworld in kernel
-## how to use
-`$make`
+The Linux kernel module progamming practice.
 
-`$sudo insmod ./MODULE_NAME.ko`
+### Compile the module
+```
+export MY_TARGET=proc-2.o
+make
+```
+We can get the compiled module `proc-2.ko`.
 
-`$dmesg | tail`
+### Load the module: 
+```
+sudo insmod ./proc-2.ko
+```
 
-`$sudo rmmod MODULE_NAME`
+### Remove the module 
+```
+sudo rmmod proc-2
+```
