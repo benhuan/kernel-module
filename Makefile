@@ -7,8 +7,9 @@ PWD := $(shell pwd)
 
 obj-m += $(MY_TARGET)
 
-obj-m += hello_part.o
-hello_part-objs := hello_part_1.o hello_part_2.o
+# used for multiple files
+# obj-m += hello_part.o
+# hello_part-objs := hello_part_1.o hello_part_2.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules
