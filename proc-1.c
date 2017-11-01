@@ -1,8 +1,7 @@
-#include <asm/uaccess.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
-
+#include <linux/uaccess.h>
 
 static char msg[128];
 static int len = 0;

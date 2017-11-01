@@ -1,17 +1,17 @@
-#include <asm/uaccess.h>
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
-
+#include <linux/types.h>
+#include <linux/uaccess.h>
 
 static char msg[128];
 static int len = 0;
 static int len_check = 1;
 
 static int my_proc_show(struct seq_file *seq, void *v) {
-  seq_printf(seq, "Print something from kernel module proc-2");
-
+  seq_printf(seq, "Print something from kernel module proc-2\n");
+  seq_puts(seq, msg);
   return 0;
 }
 static int my_proc_open(struct inode *inode, struct file *file) {
