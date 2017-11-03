@@ -1,6 +1,10 @@
 print-%  : ; @echo $* = $($*)
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
+ifndef MY_TARGET
+    $(info Set your target by using export MY_TARGET=xxx.o)
+    $(error MY_TARGET is undefined)
+endif
 
 #SRCs := $(wildcard *.c)
 #OBJs := $(SRCs:.c=.o)
