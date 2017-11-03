@@ -8,7 +8,6 @@
 #include <linux/module.h>  /* Specifically, a module */
 #include <linux/proc_fs.h> /* Necessary because we use the proc fs */
 
-
 #define PROCFS_MAX_SIZE 1024
 #define PROCFS_NAME "buffer1k"
 
@@ -40,6 +39,17 @@ int procfile_read(char *buffer, char **buffer_location, off_t offset,
 
   printk(KERN_INFO "procfile_read (/proc/%s) called\n", PROCFS_NAME);
 
+  /*
+   * We give all of our information in one go, so if the
+   * user asks us if we have more information the
+   * answer should always be no.
+   *
+   * This is important because the standard read
+   * function from the library would continue to issue
+   * the read system call until the kernel replies
+   * that it has no more information, or until its
+   * buffer is filled.
+   */
   if (offset > 0) {
     /* we have finished to read, return 0 */
     ret = 0;
