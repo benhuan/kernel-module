@@ -9,7 +9,7 @@ endif
 #SRCs := $(wildcard *.c)
 #OBJs := $(SRCs:.c=.o)
 
-obj-m += $(MY_TARGET)
+obj-m += $(MY_TARGET).o
 
 # used for multiple files
 # obj-m += hello_part.o
