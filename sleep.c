@@ -21,8 +21,8 @@
 #define MESSAGE_LENGTH 80
 static char Message[MESSAGE_LENGTH];
 
-static struct proc_dir_entry *Our_Proc_File;
 #define PROC_ENTRY_FILENAME "sleep"
+static struct proc_dir_entry *Our_Proc_File;
 
 /*
  * Since we use the file operations struct, we can't use the special proc
@@ -207,33 +207,6 @@ int module_close(struct inode *inode, struct file *file) {
 }
 
 /*
- * This function decides whether to allow an operation (return zero) or not
- * allow it (return a non-zero which indicates why it is not allowed).
- *
- * The operation can be one of the following values:
- * 0 - Execute (run the "file" - meaningless in our case)
- * 2 - Write (input to the kernel module)
- * 4 - Read (output from the kernel module)
- *
- * This is the real function that checks file permissions. The permissions
- * returned by ls -l are for reference only, and can be overridden here.
- */
-static int module_permission(struct inode *inode, int op,
-                             struct nameidata *nd) {
-  /*
-   * We allow everybody to read from our module, but only root (uid 0)
-   * may write to it
-   */
-  if (op == 4 || (op == 2 && current->euid == 0))
-    return 0;
-
-  /*
-   * If it's anything else, access is denied
-   */
-  return -EACCES;
-}
-
-/*
  * Structures to register as the /proc file, with pointers to all the relevant
  * functions.
  */
@@ -244,22 +217,11 @@ static int module_permission(struct inode *inode, int op,
  * means we don't want to deal with something.
  */
 static struct file_operations File_Ops_4_Our_Proc_File = {
+    .owner = THIS_MODULE,
     .read = module_output,   /* "read" from the file */
     .write = module_input,   /* "write" to the file */
     .open = module_open,     /* called when the /proc file is opened */
     .release = module_close, /* called when it's closed */
-};
-
-/*
- * Inode operations for our proc file.  We need it so we'll have somewhere to
- * specify the file operations structure we want to use, and the function we
- * use for permissions. It's also possible to specify functions to be called
- * for anything else which could be done to an inode (although we don't bother,
- * we just put NULL).
- */
-
-static struct inode_operations Inode_Ops_4_Our_Proc_File = {
-    .permission = module_permission, /* check for permissions */
 };
 
 /*
@@ -277,19 +239,11 @@ int init_module() {
 
   if (Our_Proc_File == NULL) {
     remove_proc_entry(PROC_ENTRY_FILENAME, NULL);
-    printk(KERN_ALERT "Error: Could not initialize /proc/test\n");
+    printk(KERN_ALERT "Error: Could not initialize /proc/sleep\n");
     return -ENOMEM;
   }
 
-  Our_Proc_File->owner = THIS_MODULE;
-  Our_Proc_File->proc_iops = &Inode_Ops_4_Our_Proc_File;
-  Our_Proc_File->proc_fops = &File_Ops_4_Our_Proc_File;
-  Our_Proc_File->mode = S_IFREG | S_IRUGO | S_IWUSR;
-  Our_Proc_File->uid = 0;
-  Our_Proc_File->gid = 0;
-  Our_Proc_File->size = 80;
-
-  printk(KERN_INFO "/proc/test created\n");
+  printk(KERN_INFO "/proc/sleep created\n");
 
   return 0;
 }
