@@ -27,9 +27,9 @@
 /*
  * The number of times the timer interrupt has been called so far
  */
-static int TimerIntrpt = 0;
+static int counter_0 = 0;
 
-static void intrpt_routine(struct work_struct *);
+static void work_routine(struct work_struct *);
 
 static int die = 0; /* set this to 1 for shutdown */
 static unsigned long onesec;
@@ -40,21 +40,21 @@ static int len_check = 1;
  */
 static struct workqueue_struct *wq;
 
-static struct delayed_work Task;
+static struct delayed_work my_work;
 
 /*
  * This function will be called on every timer interrupt. Notice the void*
  * pointer - task functions can be used for more than one purpose, each time
  * getting a different parameter.
  */
-static void intrpt_routine(struct work_struct *work) {
-  TimerIntrpt++;
-	printk(KERN_INFO "my task from sched:%d", TimerIntrpt);
+static void work_routine(struct work_struct *work) {
+  counter_0++;
+  printk(KERN_INFO "my task from sched:%d", counter_0);
   /*
    * If cleanup wants us to die
    */
   if (die == 0)
-    queue_delayed_work(wq, &Task, onesec);
+    queue_delayed_work(wq, &my_work, onesec);
 }
 
 /*
@@ -63,24 +63,24 @@ static void intrpt_routine(struct work_struct *work) {
 ssize_t procfile_read(struct file *sp_file, char __user *buf, size_t size,
                       loff_t *offset) {
   int len; /* The number of bytes actually used */
-  /*
-   * It's static so it will still be in memory
-   * when we leave this function
-   */
+           /*
+            * It's static so it will still be in memory
+            * when we leave this function
+            */
   static char my_buffer[80];
 
   if (len_check) {
     printk(KERN_INFO "Proc start reading: %lld", *offset);
     len_check = 0;
   } else {
-		printk(KERN_ALERT "Proc stop reading: %lld", *offset);
+    printk(KERN_ALERT "Proc stop reading: %lld", *offset);
     len_check = 1;
     return 0;
   }
   /*
    * Fill the buffer and get its length
    */
-  len = sprintf(my_buffer, "Timer called %d times so far\n", TimerIntrpt);
+  len = sprintf(my_buffer, "Timer called %d times so far\n", counter_0);
   printk(KERN_INFO "Proc reading: %s", my_buffer);
 
   copy_to_user(buf, my_buffer, 80);
@@ -111,9 +111,9 @@ int __init init_module() {
    * next timer interrupt
    */
   wq = create_workqueue(MY_WORK_QUEUE_NAME);
-	INIT_DELAYED_WORK(&Task, intrpt_routine);
+  INIT_DELAYED_WORK(&my_work, work_routine);
 
-  queue_delayed_work(wq, &Task, onesec);
+  queue_delayed_work(wq, &my_work, onesec);
 
   printk(KERN_INFO "/proc/%s created\n", PROC_ENTRY_FILENAME);
 
@@ -131,14 +131,14 @@ void __exit cleanup_module() {
   printk(KERN_INFO "/proc/%s removed\n", PROC_ENTRY_FILENAME);
 
   die = 1;                       /* keep intrp_routine from queueing itself */
-  cancel_delayed_work(&Task);    /* no "new ones" */
-  flush_workqueue(wq); /* wait till all "old ones" finished */
+  cancel_delayed_work(&my_work); /* no "new ones" */
+  flush_workqueue(wq);           /* wait till all "old ones" finished */
   destroy_workqueue(wq);
 
   /*
-   * Sleep until intrpt_routine is called one last time. This is
+   * Sleep until work_routine is called one last time. This is
    * necessary, because otherwise we'll deallocate the memory holding
-   * intrpt_routine and Task while work_timer still references them.
+   * work_routine and my_work while work_timer still references them.
    * Notice that here we don't allow signals to interrupt us.
    *
    * Since WaitQ is now not NULL, this automatically tells the interrupt
