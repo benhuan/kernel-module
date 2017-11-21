@@ -21,6 +21,8 @@
 #include <linux/interrupt.h> /* For irqreturn_t */
 #include <linux/uaccess.h>
 
+#include <linux/version.h>
+
 #define PROC_ENTRY_FILENAME "sched"
 #define MY_WORK_QUEUE_NAME "WQsched.c"
 
@@ -106,11 +108,22 @@ int __init init_module() {
     return -ENOMEM;
   }
 
-  /*
-   * Put the task in the work_timer task queue, so it will be executed at
-   * next timer interrupt
-   */
+/*
+ * Put the task in the work_timer task queue, so it will be executed at
+ * next timer interrupt
+ */
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37))
+  wq = alloc_workqueue(MY_WORK_QUEUE_NAME, 0, 0);
+#else
   wq = create_workqueue(MY_WORK_QUEUE_NAME);
+#endif
+
+  if (!wq) {
+    printk(KERN_ALERT "Alloc/Create workqueue failed on kernel version %s\n",
+           LINUX_VERSION_CODE);
+    goto error_out;
+  }
   INIT_DELAYED_WORK(&my_work, work_routine);
 
   queue_delayed_work(wq, &my_work, onesec);
@@ -118,6 +131,8 @@ int __init init_module() {
   printk(KERN_INFO "/proc/%s created\n", PROC_ENTRY_FILENAME);
 
   return 0;
+error_out:
+  return -1;
 }
 
 /*
