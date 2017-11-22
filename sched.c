@@ -120,11 +120,12 @@ int __init init_module() {
 #endif
 
   if (!wq) {
-    printk(KERN_ALERT "Alloc/Create workqueue failed on kernel version %s\n",
+    printk(KERN_ALERT "Alloc/Create workqueue failed on kernel version %d\n",
            LINUX_VERSION_CODE);
     goto error_out;
   }
-  INIT_DELAYED_WORK(&my_work, work_routine);
+
+	INIT_DELAYED_WORK(&my_work, work_routine);
 
   queue_delayed_work(wq, &my_work, onesec);
 
